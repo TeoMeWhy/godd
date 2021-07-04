@@ -12,13 +12,10 @@ type Duel struct {
 }
 
 func (d *Duel) ExecMonstersDuel() {
-
 	for len(d.raid.Fighters) > 0 && len(d.horde.Fighters) > 0 {
-
 		d.RaidTurn()
 		d.HordeTurn()
 	}
-
 }
 
 func (d *Duel) HordeTurn() {
@@ -31,14 +28,13 @@ func (d *Duel) HordeTurn() {
 }
 
 func (d *Duel) RaidTurn() {
-
-	//TODO implementar o turno da Raid
+	// TODO implementar o turno da Raid
 	fmt.Println("\nTurno da", d.raid.Name)
-
 }
 
-func (d *Duel) ExecTurnAsync(attacker Fighter, enemyGang *Gang, ch chan string) {
-
+// ExecTurnAsync executes am attack turn from the attacker to the first valid
+// target name received from the given channel.
+func (d *Duel) ExecTurnAsync(attacker Fighter, enemyGang *Gang, ch <-chan string) {
 	fmt.Println("Turno Executado por:", attacker.GetName())
 	timeout := time.After(time.Second * 5) // tempo para escolha
 
@@ -52,7 +48,7 @@ func (d *Duel) ExecTurnAsync(attacker Fighter, enemyGang *Gang, ch chan string) 
 					return
 				}
 			}
-			fmt.Println("Escola um target válido.")
+			fmt.Println("Escolha um target válido.")
 
 		case <-timeout:
 			fmt.Println("Nenhum alvo selecionado a tempo.")
@@ -61,15 +57,13 @@ func (d *Duel) ExecTurnAsync(attacker Fighter, enemyGang *Gang, ch chan string) 
 	}
 }
 
+// ExecTurn calculates and applies the result of an attack from the attacker towards the target.
 func (d *Duel) ExecTurn(attacker Fighter, target Fighter) {
-
-	//TODO: implementar racional do dano e armadura
+	// TODO: implementar racional do dano e armadura
 	target.SubLife(attacker.CombatDice())
-
 }
 
 func (d *Duel) String() string {
-
 	raiders := ""
 	for _, v := range d.raid.Fighters {
 		raiders += v.GetName() + "\n"

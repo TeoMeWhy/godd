@@ -1,0 +1,41 @@
+run:
+  skip-dirs-use-default: true
+  tests: true
+
+linters:
+  disable:
+    # Disable misspell to allow portuguese texts
+    - misspell
+    # Disable deprecated linter
+    - scopelint
+  presets:
+    - format
+    - bugs
+    - comment
+    - complexity
+    - metalinter
+    - module
+    - import
+    - sql
+    - unused
+
+  enable:
+    - paralleltest
+    - tparallel
+
+linters-settings:
+  gosec:
+    # To specify a set of rules to explicitly exclude.
+    # Available rules: https://github.com/securego/gosec#available-rules
+    excludes:
+      # Excludes "Use of weak random number generator (math/rand instead of crypto/rand)"
+      # There is no need to require cryptographically secure random numbers in this project
+      - G404
+
+severity:
+  default-severity: error
+
+  rules:
+    - linters:
+        - godox
+      severity: warn

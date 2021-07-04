@@ -2,27 +2,30 @@ package main
 
 import (
 	"fmt"
-	"godd/rpg"
+	"log"
 	"math/rand"
 	"time"
 
 	"github.com/joho/godotenv"
+	"godd/rpg"
 )
 
 func main() {
-
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("Could not load dotenv files: %+v", err)
+	}
 
 	rand.Seed(time.Now().UnixNano())
 
 	teo := rpg.NewPerson("Teo", "elfo", "clerigo")
-	//fmt.Println("Personagem\n ", teo)
+	// fmt.Println("Personagem\n ", teo)
 
 	nah := rpg.NewPerson("Nah", "humano", "ladino")
-	//fmt.Println("Personagem\n ", nah)
+	// fmt.Println("Personagem\n ", nah)
 
 	orc := rpg.NewCreature("Or1", "orc", "guerreiro")
-	//fmt.Println("\n\nMonstro\n", orc)
+	// fmt.Println("\n\nMonstro\n", orc)
 
 	raid := rpg.NewGang("Raid", teo, nah) // time de players
 	horde := rpg.NewGang("Horda", orc)    // time de monstros
@@ -31,6 +34,5 @@ func main() {
 
 	fmt.Println(duel)
 
-	duel.ExecDuel()
-
+	duel.ExecMonstersDuel()
 }
