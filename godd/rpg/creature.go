@@ -25,9 +25,8 @@ type Creature struct {
 	Armor            uint32
 }
 
-// NewCreature creates return a new creature based on name and race
+// NewCreature creates return a new creature based on name and race.
 func NewCreature(name, race, class string) *Creature {
-
 	c := Creature{
 		Name:  name,
 		Race:  race,
@@ -43,40 +42,44 @@ func NewCreature(name, race, class string) *Creature {
 	return &c
 }
 
-// MakePrimaryAttribute para atributos primários
-func (c *Creature) makePrimaryAttribute() {
-
-	att := map[string][]string{
-		"clerigo":   {"sabedoria"},
-		"guerreiro": {"forca", "destreza"},
-		"ladino":    {"destreza"},
-		"mago":      {"inteligencia"},
-	}
-	c.PrimaryAttribute = att[c.Class][rand.Intn(len(att[c.Class]))]
+// classAttributeMap relates the name of the classes to its attributes.
+// Although maps cannot be initialized as constants we treat this value as constant.
+var classAttributeMap = map[string][]string{
+	"clerigo":   {"sabedoria"},
+	"guerreiro": {"forca", "destreza"},
+	"ladino":    {"destreza"},
+	"mago":      {"inteligencia"},
 }
 
-// RollDiceAttibute generates points to one attribute
-func (c *Creature) rollDiceAttibute() int {
+// makePrimaryAttribute sets a random attribute out of the available for the creature's class
+// and set it as the PrimaryAttribute.
+func (c *Creature) makePrimaryAttribute() {
+	c.PrimaryAttribute = classAttributeMap[c.Class][rand.Intn(len(classAttributeMap[c.Class]))]
+}
 
-	dices := []int{}
+// rollDiceAttribute generates the initial points to an attribute.
+func rollDiceAttribute() int {
+	// Initialize the slice with length 4
+	dices := make([]int, 4)
 
-	for len(dices) < 4 {
-		dices = append(dices, (rand.Intn(6) + 1))
+	for i := 0; i < len(dices); i++ {
+		dices[i] = rand.Intn(6) + 1
 	}
 
 	sort.Ints(dices)
 	sum := 0
 
+	// Ignore the smallest roll
 	for _, v := range dices[1:] {
 		sum += v
 	}
+
 	return sum
 }
 
-// CreateAttributes makes a link between attributes and points by dices
+// createAttributes makes a link between attributes and points by dices.
 func (c *Creature) createAttributes() {
-
-	att := []string{
+	attrs := []string{
 		"forca",
 		"destreza",
 		"constituicao",
@@ -86,28 +89,27 @@ func (c *Creature) createAttributes() {
 	}
 
 	// order attributes by random excluding primaryAttribute
-	newAtts := utils.RemoveElement(att, c.PrimaryAttribute)
-	rand.Shuffle(len(newAtts), func(i, j int) { att[i], att[j] = att[j], att[i] })
-	newAtts = append(newAtts, c.PrimaryAttribute)
+	attrs = utils.RemoveElement(attrs, c.PrimaryAttribute)
+	rand.Shuffle(len(attrs), func(i, j int) { attrs[i], attrs[j] = attrs[j], attrs[i] })
+	attrs = append(attrs, c.PrimaryAttribute)
 
 	// generate all dices with same size of attributes
-	points := []int{}
-	for i := 0; i < len(newAtts); i++ {
-		points = append(points, c.rollDiceAttibute())
+	points := make([]int, len(attrs))
+	for i := 0; i < len(points); i++ {
+		points[i] = rollDiceAttribute()
 	}
 	sort.Ints(points)
 
 	mapAtt := make(map[string]uint32)
-	for i, v := range newAtts {
+	for i, v := range attrs {
 		mapAtt[v] = uint32(points[i])
 	}
 
 	c.Attributes = mapAtt
 }
 
-// CalcModifiers calculates all modifiers based on Attibutes
+// CalcModifiers calculates all modifiers based on Attibutes.
 func (c *Creature) calcModifiers() {
-
 	mods := make(map[string]uint32)
 	raceMods := c.loadModifiers()
 
@@ -125,21 +127,20 @@ func (c *Creature) calcModifiers() {
 	c.Modifiers = mods
 }
 
-// MakeLifeDice calculates a Life Dice of creature
+// MakeLifeDice calculates a Life Dice of creature.
 func (c *Creature) makeLifeDice() {
-
 	data := map[string]uint32{
 		"clerigo":   8,
 		"guerreiro": 10,
 		"ladino":    8,
-		"mago":      6}
+		"mago":      6,
+	}
 
 	c.LifeDice = data[c.Class] + c.Modifiers["constituicao"]
 	c.TotalLife = c.LifeDice
 }
 
 func (c *Creature) String() string {
-
 	txt := `
 	Name:             %s
 	Race:             %s
@@ -176,7 +177,6 @@ func (c *Creature) String() string {
 }
 
 func (c *Creature) loadModifiers() map[string]uint32 {
-
 	database := os.Getenv("DATABASE")
 	fmt.Println(database)
 	con := db.OpenSQLite(database)
@@ -230,13 +230,11 @@ func (c *Creature) GetName() string {
 }
 
 func (c *Creature) SubLife(damage uint32) {
-
 	if damage > c.TotalLife {
 		c.TotalLife = 0
 	} else {
 		c.TotalLife -= damage
 	}
-
 }
 
 func (c *Creature) GetLife() uint32 {

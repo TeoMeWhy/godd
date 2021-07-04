@@ -5,10 +5,11 @@ import (
 	"io/ioutil"
 	"log"
 
+	// Load sqlite driver onto the sql registry.
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// OpenSQLite creates a connection to SQLite engine by path
+// OpenSQLite creates a connection to SQLite engine by path.
 func OpenSQLite(path string) *sql.DB {
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
@@ -18,7 +19,7 @@ func OpenSQLite(path string) *sql.DB {
 	return db
 }
 
-// ImportQuery imports a query from a .txt file by path
+// ImportQuery imports a query from a .txt file by path.
 func ImportQuery(path string) string {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {

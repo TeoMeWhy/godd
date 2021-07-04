@@ -1,8 +1,5 @@
 package rpg
 
-interface Mannager {
-
+type Manager interface {
 	Listen(userName, action string, ch chan<- string) int
-	
-
 }
